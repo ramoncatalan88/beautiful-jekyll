@@ -24,7 +24,7 @@ gosling:
 
 
 
-![]({{ site.baseurl }}/assets/img/ryan-v-ryan.jpg) 
+![](/beautiful-jekyll/assets/img/ryan-v-ryan.jpg) 
 
 
 ## Lorem Ipsum
