@@ -1,0 +1,155 @@
+---
+title: "Cleaning Currency Data in R"
+author: "Ramon Catalan"
+date: "2026-10-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Data is not always imported into R in a format that is ready for analysis. One common example is salary or other currency data. Values such as "$75,000" may look like numbers, but R can treat them as text because of the dollar sign and comma.
+
+In this code-through, I will show how to identify currency stored as text, clean the values, convert them to numeric data, and use the cleaned values for analysis.
+
+# Create Example Salary Data
+
+First, we will create a small dataset with employee names and salaries.
+
+```{r}
+salary_data <- data.frame(
+  employee = c("Alex", "Jordan", "Taylor", "Morgan", "Casey"),
+  salary = c("$65,000", "$72,500", "$81,250", "$95,000", "$110,500")
+)
+
+salary_data
+```
+
+# Check the Data Type
+
+Before doing any calculations, it is important to check how R is storing the salary values.
+
+```{r}
+class(salary_data$salary)
+```
+
+The result shows that the salary column is stored as **character** data instead of numeric data. This happens because the values contain dollar signs and commas.
+
+Because R sees these values as text, we cannot correctly calculate things like the mean or median salary yet.
+
+# What Happens If We Convert It Directly?
+
+A common mistake is trying to convert the salary column directly with `as.numeric()`.
+
+```{r}
+as.numeric(salary_data$salary)
+```
+
+This does not work correctly because the dollar signs and commas are still part of the text. R cannot interpret values such as "$65,000" as numbers until those extra characters are removed.
+
+This is why cleaning the values first is important.
+
+# Remove Dollar Signs and Commas
+
+Before converting the salary values to numbers, we need to remove the dollar signs and commas.
+
+The `gsub()` function can replace unwanted characters in text.
+
+```{r}
+salary_data$salary_clean <- gsub("\\$", "", salary_data$salary)
+salary_data$salary_clean <- gsub(",", "", salary_data$salary_clean)
+
+salary_data
+```
+
+Now the new `salary_clean` column no longer contains dollar signs or commas. The values look numeric, but they are still stored as character data.
+
+
+# Convert the Cleaned Values to Numeric
+
+Now that the dollar signs and commas have been removed, we can convert the cleaned salary values to numeric data.
+
+```{r}
+salary_data$salary_numeric <- as.numeric(salary_data$salary_clean)
+
+class(salary_data$salary_numeric)
+
+salary_data
+```
+
+The new `salary_numeric` column is stored as numeric data. We can now use these values in calculations and statistical summaries.
+
+# Create a Reusable Function
+
+If we need to clean many currency values, it is easier to create a function instead of repeating the same steps each time.
+
+```{r}
+convert_currency <- function(x)
+{
+  x <- gsub("\\$", "", x)
+  x <- gsub(",", "", x)
+  x <- as.numeric(x)
+  return(x)
+}
+```
+
+Now we can use the function on the original salary column.
+
+```{r}
+salary_data$salary_function <- convert_currency(salary_data$salary)
+
+salary_data
+```
+
+The function removes the extra currency symbols and converts the values to numeric data in one step.
+
+# Use the Cleaned Salary Data
+
+Now that the salary values are numeric, we can calculate summary statistics.
+
+```{r}
+mean(salary_data$salary_numeric)
+median(salary_data$salary_numeric)
+min(salary_data$salary_numeric)
+max(salary_data$salary_numeric)
+```
+
+These calculations would not work correctly when the salary values were stored as character data. After cleaning and converting the values, R can use them for analysis.
+
+# Before and After
+
+It can be helpful to compare the original salary values with the cleaned numeric values.
+
+```{r}
+salary_data[, c("employee", "salary", "salary_numeric")]
+```
+
+The original `salary` column contains dollar signs and commas, so R stores it as character data. The `salary_numeric` column contains only numbers, which makes it ready for calculations, summaries, and graphs.
+
+
+# Conclusion
+
+Currency values can look like numbers even when R stores them as text. Before using salary data in calculations, it is important to check the data type and remove extra characters such as dollar signs and commas.
+
+In this tutorial, we used `gsub()` to clean the values, `as.numeric()` to convert them, and a custom `convert_currency()` function to make the process reusable.
+
+Cleaning data types correctly is a small step, but it is important because it helps prevent errors and makes the data ready for analysis.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
